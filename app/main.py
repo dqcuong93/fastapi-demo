@@ -1,8 +1,9 @@
 from typing import Annotated
 
 from fastapi import Body, Depends, FastAPI, HTTPException, Path, Query
-from sqlmodel import (Field, Relationship, Session, SQLModel, create_engine,
-                      select)
+from sqlmodel import Field, Relationship, Session, SQLModel, select
+
+from db import create_db_and_tables, get_session
 
 
 # Team models ###
@@ -79,23 +80,7 @@ class TeamReadWithHeroes(TeamRead):
 # End Hero and Team link models ###
 
 
-# DB engine ###
-sqlite_file_name = "database.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
-
-connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, echo=True, connect_args=connect_args)
-
-
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
-
-
-def get_session():
-    with Session(engine) as session:
-        yield session
-
-
+# Define FastAPI application ###
 app = FastAPI()
 
 
@@ -104,7 +89,7 @@ def on_startup():
     create_db_and_tables()
 
 
-# End DB engine ###
+# End Define FastAPI application ###
 
 
 # Hero CRUD ###
