@@ -1,4 +1,5 @@
 from typing import Annotated
+from contextlib import asynccontextmanager
 
 from fastapi import Body, Depends, FastAPI, HTTPException, Path, Query
 from sqlmodel import Field, Relationship, Session, SQLModel, select
@@ -81,12 +82,13 @@ class TeamReadWithHeroes(TeamRead):
 
 
 # Define FastAPI application ###
-app = FastAPI()
-
-
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     create_db_and_tables()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 # End Define FastAPI application ###
